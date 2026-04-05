@@ -1,113 +1,105 @@
-# 🚀 SureFlow — Production-Grade Batch Data Enrichment Pipeline
+<div align="center">
 
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,12,20&height=160&section=header&text=SureFlow%20Data%20Enrichment&fontSize=34&fontColor=fff&animation=fadeIn&fontAlignY=38&desc=Production-grade%20batch%20pipeline%20%7C%20Python%20·%20FastAPI%20·%20Pluggable%20Providers&descAlignY=57&descSize=14"/>
 
-## 👤 My Contribution
+</div>
 
-Designed and built a modular batch data processing system focused on real-world data engineering challenges.
+<div align="center">
 
-Key contributions:
-- Designed pluggable provider architecture (Mock + Real API abstraction)
-- Implemented offline demo mode to remove dependency on external APIs
-- Built end-to-end batch pipeline (CSV ingestion → enrichment → output)
-- Ensured production-grade practices (logging, error handling, security)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Pandas](https://img.shields.io/badge/pandas-Data%20Pipeline-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![Pydantic](https://img.shields.io/badge/Pydantic-v2-E92063?style=for-the-badge&logo=python&logoColor=white)
+![Demo Mode](https://img.shields.io/badge/Demo-No%20Credentials%20Needed-22C55E?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-22C55E?style=for-the-badge)
 
-This project reflects how real backend/data systems are designed for scalability, reliability, and developer usability.
-
-## 📸 Demo
-
-![Demo Output](assets/demo.png)
-
-> **A production-grade data engineering pipeline that batch-processes identity verification records through a pluggable provider layer — fully runnable offline in demo mode.**
-
-[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue?logo=python)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Demo Mode](https://img.shields.io/badge/Demo-No%20Credentials%20Required-brightgreen)](#demo-mode)
+</div>
 
 ---
 
-## Problem Statement
+## 👨‍💻 Built By
 
-Organisations that process large volumes of identity documents (PAN cards, RC numbers, GST certificates) need a reliable, observable, and scalable batch pipeline that can:
+**Dheeraj Kandpal** — Data & Backend Engineer at [Surepass](https://surepass.io)
 
-- Ingest records from CSV files
-- Verify each record against an external KYC provider API
-- Handle failures gracefully (validation errors, rate limits, server errors)
-- Produce clean, auditable output CSVs with per-record outcomes
-- **Work offline during development and CI without any real API credentials**
+This project came directly from production experience: I process thousands of identity verification records daily (PAN, RC, GST, MCA) at Surepass using batch Python pipelines. SureFlow is the clean, open-source version of that architecture — built to show how real data engineering systems should be designed.
 
-SureFlow solves all of this with a pluggable provider architecture and a built-in demo mode.
+> *Not a tutorial project. Not a toy. A production pattern — fully runnable offline.*
 
 ---
 
-## Features
+## 📌 What This Project Does
 
-| Feature | Detail |
-|---------|--------|
-| 🔌 **Pluggable provider layer** | Swap Mock ↔ Real provider with a single env variable |
-| 📊 **CSV batch processing** | Reads any CSV, enriches each row, writes a timestamped output |
-| 🟢 **Zero-credential demo** | Fully functional offline. No API keys needed for `DEMO_MODE=true` |
+SureFlow is a **batch data enrichment pipeline** that takes a CSV of identity records, sends each one through a verification provider (KYC API), and outputs a clean, auditable results CSV — with full logging, error handling, and status codes per record.
+
+```
+inputs/records.csv  →  Provider Layer  →  outputs/results_20260405.csv
+    (PAN, RC, GST)      (Mock or Real)      (status, message, data per row)
+```
+
+**The problem it solves:** Organisations processing large volumes of identity documents need a pipeline that handles API failures gracefully, works offline during development, produces clean audit trails, and can swap providers without changing business logic. This does all of it.
+
+---
+
+## ⚡ Key Features
+
+| Feature | What it means |
+|---------|---------------|
+| 🔌 **Pluggable provider architecture** | Swap Mock ↔ Real API with a single `.env` flag — zero code changes |
+| 🟢 **Full offline demo mode** | Runs completely without API credentials — deterministic mock responses |
+| 📊 **Batch CSV processing** | Reads any CSV, enriches every row, writes timestamped output |
+| 🛡️ **Consistent response schema** | Every provider returns identical `{status, status_code, message, error, data}` |
 | 📋 **Structured logging** | Every record logged to `stdout` + `logs/app.log` |
-| 🛡️ **Consistent response schema** | All providers emit identical `{status, status_code, message, error, data}` |
 | 🌐 **FastAPI REST backend** | Full API server with job management and async worker |
-| 🔐 **Auth & RBAC** | Role-based access control, optional Google Sign-In |
-| 💾 **SQLite / PostgreSQL** | Single-file DB for dev, PostgreSQL-ready for production |
+| 🔐 **Auth & RBAC** | Role-based access, optional Google Sign-In |
+| 💾 **SQLite → PostgreSQL** | Single-file DB for dev, production-ready Postgres config |
 
 ---
 
-## Architecture
-
-```
-phase1-project/
-├── providers/                   # 🔌 Provider layer (core abstraction)
-│   ├── base.py                  #    BaseProvider — abstract contract + _build_response()
-│   ├── mock_provider.py         #    MockProvider  — offline demo, no credentials
-│   ├── real_provider.py         #    RealProvider  — stub, ready for live API integration
-│   ├── factory.py               #    get_provider() — DEMO_MODE switch
-│   └── __init__.py
-│
-├── utils/
-│   └── logger.py                # 📋 Centralised logging (stdout + file)
-│
-├── server/
-│   ├── main.py                  # 🌐 FastAPI application + REST endpoints
-│   └── worker.py                # ⚙️  Async batch worker
-│
-├── src/
-│   ├── api/surepass_client.py   #    External API HTTP client
-│   ├── db/                      #    Database helpers (SQLite / PostgreSQL)
-│   ├── models/                  #    Pydantic data models
-│   └── utils/                   #    Shared helpers
-│
-├── inputs/
-│   └── sample.csv               # 📥 Sample test records (5 cases)
-│
-├── outputs/                     # 📤 Generated output CSVs (gitignored)
-├── logs/                        # 📋 app.log (gitignored)
-│
-├── run_demo.py                  # 🚀 Demo pipeline runner — START HERE
-├── test_provider.py             # 🧪 Quick smoke test
-├── .env.example                 # 🔑 Environment template (safe to commit)
-└── requirements.txt
-```
-
-### Provider Flow
+## 🏗️ Architecture
 
 ```
 run_demo.py
-    └── get_provider()           # reads DEMO_MODE from .env
-            ├── DEMO_MODE=true  → MockProvider  (offline, deterministic)
-            └── DEMO_MODE=false → RealProvider  (live API, needs token)
+    └── get_provider()              ← reads DEMO_MODE from .env
+            ├── DEMO_MODE=true  →  MockProvider   (offline, deterministic)
+            └── DEMO_MODE=false →  RealProvider   (live API, needs token)
                     └── enrich(record) → { status, status_code, message, error, data }
+```
+
+### Folder Structure
+
+```
+sureflow-data-enrichment/
+│
+├── providers/                  ← Core abstraction layer
+│   ├── base.py                 ← BaseProvider — abstract contract
+│   ├── mock_provider.py        ← Offline demo, no credentials needed
+│   ├── real_provider.py        ← Stub ready for live API wiring
+│   └── factory.py              ← get_provider() — DEMO_MODE switch
+│
+├── server/
+│   ├── main.py                 ← FastAPI app + REST endpoints
+│   └── worker.py               ← Async batch worker
+│
+├── src/
+│   ├── api/surepass_client.py  ← External API HTTP client
+│   ├── db/                     ← Database helpers
+│   ├── models/                 ← Pydantic data models
+│   └── utils/                  ← Shared helpers
+│
+├── utils/logger.py             ← Centralised logging
+├── inputs/sample.csv           ← 5 sample test records
+├── run_demo.py                 ← START HERE — demo pipeline runner
+├── test_provider.py            ← Quick smoke test
+└── .env.example                ← Safe environment template
 ```
 
 ### Standardised Response Schema
 
-Every provider — regardless of type — returns:
+Every provider — Mock or Real — returns the exact same shape:
 
 ```json
 {
-    "status":      "success | error",
+    "status":      "success",
     "status_code": 200,
     "message":     "Record verified successfully",
     "error":       null,
@@ -120,33 +112,27 @@ Every provider — regardless of type — returns:
 }
 ```
 
+This is the key design decision — the rest of the pipeline never needs to know which provider ran.
+
 ---
 
-## Quick Start
-
-### 1 — Clone and install
+## 🚀 Quick Start
 
 ```bash
-git clone https://github.com/your-username/sureflow.git
-cd sureflow/phase1-project
-
+# 1. Clone and install
+git clone https://github.com/DheerajKandpal/sureflow-data-enrichment.git
+cd sureflow-data-enrichment
 pip install -r requirements.txt
-```
 
-### 2 — Configure environment
-
-```bash
+# 2. Configure (demo mode is already on — no API keys needed)
 cp .env.example .env
-# DEMO_MODE=true is already set — no further changes needed for the demo
-```
 
-### 3 — Run the demo pipeline
-
-```bash
+# 3. Run
 python run_demo.py
 ```
 
-**Expected output:**
+### Expected Output
+
 ```
 ══════════════════════════════════════════════════════════════
   SureFlow Demo Pipeline
@@ -154,75 +140,60 @@ python run_demo.py
   Provider  : MockProvider
   Records   : 5
 ────────────────────────────────────────────────────────────
-  IDENTIFIER           STATUS     CODE   MESSAGE
+  IDENTIFIER      STATUS     CODE   MESSAGE
 ────────────────────────────────────────────────────────────
-  AABCP1234C           success    200    Record verified successfully
-  MH12AB1234           success    200    Record verified successfully
-  INVALID99            error      422    Invalid identifier format
-  TIMEOUT00            error      500    Mock internal server error
-  (empty)              error      400    Identifier is required
-
+  AABCP1234C      success    200    Record verified successfully
+  MH12AB1234      success    200    Record verified successfully
+  INVALID99       error      422    Invalid identifier format
+  TIMEOUT00       error      500    Mock internal server error
+  (empty)         error      400    Identifier is required
 ══════════════════════════════════════════════════════════════
-  Summary
-────────────────────────────────────────────────────────────
-  Provider               MockProvider
-  Total records          5
-  ✓ Success              2
-  ✗ Failed               3
-  Output CSV             outputs/demo_output_20260405_194500.csv
+  ✓ Success: 2   ✗ Failed: 3   Output: outputs/demo_output_*.csv
 ══════════════════════════════════════════════════════════════
 ```
 
 ---
 
-## Demo Mode
+## 🔌 Demo Mode vs Real Mode
 
-SureFlow ships with `DEMO_MODE=true` by default.
+| | `DEMO_MODE=true` | `DEMO_MODE=false` |
+|---|---|---|
+| Provider | MockProvider | RealProvider |
+| Credentials | ❌ None needed | ✅ Surepass token |
+| Behaviour | Deterministic offline responses | Live API calls |
+| Use case | Dev, testing, portfolio demo | Production |
 
-| Mode | Provider | Credentials needed | Behaviour |
-|------|----------|--------------------|-----------|
-| `DEMO_MODE=true` | `MockProvider` | ❌ None | Deterministic offline responses |
-| `DEMO_MODE=false` | `RealProvider` | ✅ Surepass token | Live API (stub until token supplied) |
+**Mock simulation rules:**
 
-### Mock simulation rules
-
-| Input Pattern | HTTP Code | Outcome |
-|--------------|-----------|---------|
+| Input Pattern | Code | Result |
+|---|---|---|
 | Contains `INVALID` or ends with `99` | 422 | Invalid identifier |
 | Contains `ERROR` or ends with `00` | 500 | Server error |
 | Empty string | 400 | Missing identifier |
-| Anything else | 200 | ✅ Verified successfully |
+| Anything else | 200 | ✅ Verified |
 
 ---
 
-## Sample Input / Output
+## 📊 Sample Input → Output
 
-### `inputs/sample.csv`
+**`inputs/sample.csv`**
 
-| identifier | workflow | payload_note |
-|-----------|---------|--------------|
-| AABCP1234C | pan_verify | Standard PAN card |
-| MH12AB1234 | rc_verify | Vehicle RC number |
+| identifier | workflow | note |
+|---|---|---|
+| AABCP1234C | pan_verify | Valid PAN |
+| MH12AB1234 | rc_verify | Valid RC number |
 | INVALID99 | pan_verify | Triggers 422 |
 | TIMEOUT00 | rc_verify | Triggers 500 |
-| _(empty)_ | pan_verify | Triggers 400 |
+| *(empty)* | pan_verify | Triggers 400 |
 
-### `outputs/demo_output_*.csv`
-
-| identifier | workflow | status | status_code | message | error | data_json |
-|-----------|---------|--------|-------------|---------|-------|-----------|
-| AABCP1234C | pan_verify | success | 200 | Record verified… | | `{"identifier":"AABCP1234C"...}` |
-| MH12AB1234 | rc_verify | success | 200 | Record verified… | | `{"identifier":"MH12AB1234"...}` |
-| INVALID99 | pan_verify | error | 422 | Invalid identifier format | invalid_identifier | |
-| TIMEOUT00 | rc_verify | error | 500 | Mock internal server error | mock_server_error | |
-| | pan_verify | error | 400 | Identifier is required | empty_identifier | |
+**`outputs/demo_output_*.csv`** — one row per input with full status, message, and JSON data.
 
 ---
 
-## Running the Full Server
+## 🌐 Running the API Server
 
 ```bash
-# Start the FastAPI backend
+# Start FastAPI backend
 uvicorn server.main:app --reload --host 127.0.0.1 --port 8000
 
 # Health check
@@ -231,17 +202,17 @@ curl http://127.0.0.1:8000/api/health
 
 ---
 
-## Connecting a Real Provider
+## 🔑 Connecting a Real Provider
 
 1. Set `DEMO_MODE=false` in `.env`
 2. Set `SUREPASS_PRIMARY_TOKEN=<your_jwt>` in `.env`
-3. Open `providers/real_provider.py` and replace the stub body with the commented-out `httpx` call
+3. Open `providers/real_provider.py` → replace the stub with the `httpx` call
 
-No other file changes required — the provider interface is the only contract.
+No other files change. The provider interface is the only contract everything else depends on.
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -251,46 +222,33 @@ No other file changes required — the provider interface is the only contract.
 | HTTP Client | httpx |
 | Validation | pydantic v2 |
 | Database | SQLite (dev) / PostgreSQL (prod) |
-| Logging | Python stdlib `logging` |
+| Logging | Python stdlib logging |
 | Environment | python-dotenv |
 
 ---
 
-## Security Notes
+## 🔒 Security Practices
 
-- `.env` is **gitignored** — never committed
-- `.env.example` is the safe, token-free template for onboarding
-- `inputs/` is **gitignored** except `inputs/sample.csv` — real client data never enters the repo
+- `.env` is gitignored — never committed. `.env.example` is the safe onboarding template
+- `inputs/` is gitignored except `sample.csv` — real client data never enters the repo
 - `outputs/` and `logs/` are gitignored — only artefacts, never source data
-- All tokens are read from environment variables at runtime — zero hardcoded secrets
+- All tokens read from env at runtime — zero hardcoded secrets anywhere
 
 ---
 
-## Repo Size Considerations
+## 📬 Connect
 
-| Path | Status | Reason |
-|------|--------|--------|
-| `inputs/*.csv` (except sample) | ✅ Gitignored | Multi-MB real client data |
-| `outputs/` | ✅ Gitignored | Generated; reproducible |
-| `logs/` | ✅ Gitignored | Ephemeral |
-| `node_modules/` | ✅ Gitignored | Regenerable via npm |
-| `venv/`, `.venv/` | ✅ Gitignored | Regenerable via pip |
-| `*.db` | ✅ Gitignored | Local state |
-| `inputs/sample.csv` | ✅ Committed | 5 rows, <1 KB |
+<div align="center">
 
-Expected committed repo size: **< 500 KB**
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Dheeraj%20Kandpal-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/dheerajkandpal)
+[![GitHub](https://img.shields.io/badge/GitHub-DheerajKandpal-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/DheerajKandpal)
+[![Email](https://img.shields.io/badge/Email-dheeraj.kandpal%40surepass.io-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:dheeraj.kandpal@surepass.io)
+
+</div>
 
 ---
 
-## Sensitive Data Exposure Risks — Mitigated
-
-| Risk | Mitigation |
-|------|-----------|
-| API token in `.env` | `.env` gitignored; `.env.example` has placeholder only |
-| Real client PAN/RC data in `inputs/` | `inputs/*` gitignored; only `sample.csv` committed |
-| Surepass JWT in code | Never hardcoded; always `os.getenv()` |
-| Response data in `outputs/` | `outputs/` gitignored |
-
----
-
-*Built as a production-ready data engineering portfolio project demonstrating clean architecture, modular design, and real-world pipeline thinking.*
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,12,20&height=80&section=footer"/>
+<sub>Built from real production experience at Surepass · Python · FastAPI · Pluggable architecture · Fully offline demo</sub>
+</div>
