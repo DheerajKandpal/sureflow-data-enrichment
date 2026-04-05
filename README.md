@@ -1,4 +1,21 @@
-# SureFlow — Batch Identity Verification Pipeline
+# 🚀 SureFlow — Production-Grade Batch Data Enrichment Pipeline
+
+
+## 👤 My Contribution
+
+Designed and built a modular batch data processing system focused on real-world data engineering challenges.
+
+Key contributions:
+- Designed pluggable provider architecture (Mock + Real API abstraction)
+- Implemented offline demo mode to remove dependency on external APIs
+- Built end-to-end batch pipeline (CSV ingestion → enrichment → output)
+- Ensured production-grade practices (logging, error handling, security)
+
+This project reflects how real backend/data systems are designed for scalability, reliability, and developer usability.
+
+## 📸 Demo
+
+![Demo Output](assets/demo.png)
 
 > **A production-grade data engineering pipeline that batch-processes identity verification records through a pluggable provider layer — fully runnable offline in demo mode.**
 
