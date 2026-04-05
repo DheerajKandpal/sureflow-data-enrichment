@@ -1,0 +1,193 @@
+tokens:
+  primary: Bearer SET_VIA_ENV
+  secondary: Bearer SET_VIA_ENV
+identifier_patterns:
+  rc_number:
+    regex: ^[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{4}$
+    hint_words:
+    - rc
+    - reg
+    - registration
+    - vehicle
+    - veh
+    maps_to_workflow: rc_details
+  pan_number:
+    regex: ^[A-Z]{5}[0-9]{4}[A-Z]{1}$
+    hint_words:
+    - pan
+    - permanent account
+    maps_to_workflow: pan_details
+  gst_number:
+    regex: ^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$
+    hint_words:
+    - gst
+    - gstin
+    - gstn
+    maps_to_workflow: gst_details
+  chassis_number:
+    regex: ^[A-HJ-NPR-Z0-9]{17}$
+    hint_words:
+    - chassis
+    - vin
+    - frame
+    maps_to_workflow: chassis_details
+  aadhaar_number:
+    regex: ^[2-9]{1}[0-9]{11}$
+    hint_words:
+    - aadhaar
+    - aadhar
+    - uid
+    maps_to_workflow: aadhaar_details
+  cin_number:
+    regex: ^[A-Z]{1}[0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6}$
+    hint_words:
+    - cin
+    - company identification
+    maps_to_workflow: cin_details
+  din_number:
+    regex: ^[0-9]{8}$
+    hint_words:
+    - din
+    - director
+    maps_to_workflow: din_details
+apis:
+  rc_details:
+    url: https://kyc-api.surepass.io/api/v1/rc/rc-full
+    method: POST
+    payload_template:
+      id_number: '{input}'
+      backend_string: caryanam_ulip_with_reprint
+    success_codes:
+    - 200
+    - 201
+    save_codes:
+    - 200
+    - 201
+    - 422
+    retry_codes:
+    - 500
+    - 502
+    - 503
+  pan_details:
+    url: https://kyc-api.surepass.io/api/v1/pan/pan
+    method: POST
+    payload_template:
+      id_number: '{input}'
+    success_codes:
+    - 200
+    save_codes:
+    - 200
+    - 422
+    retry_codes:
+    - 500
+    - 502
+    - 503
+  gst_details:
+    url: https://kyc-api.surepass.io/api/v1/gstin/gstin
+    method: POST
+    payload_template:
+      id_number: '{input}'
+    success_codes:
+    - 200
+    save_codes:
+    - 200
+    - 422
+    retry_codes:
+    - 500
+    - 502
+    - 503
+  chassis_details:
+    url: https://kyc-api.surepass.io/api/v1/rc/chassis-engine-to-rc
+    method: POST
+    payload_template:
+      id_number: '{input}'
+    success_codes:
+    - 200
+    save_codes:
+    - 200
+    - 422
+    retry_codes:
+    - 500
+    - 502
+    - 503
+  aadhaar_details:
+    url: https://kyc-api.surepass.io/api/v1/aadhaar-v2/generate-otp
+    method: POST
+    payload_template:
+      id_number: '{input}'
+    success_codes:
+    - 200
+    save_codes:
+    - 200
+    - 422
+    retry_codes:
+    - 500
+    - 502
+    - 503
+  cin_details:
+    url: https://kyc-api.surepass.io/api/v1/corporate/get-corporate-info
+    method: POST
+    payload_template:
+      id_number: '{input}'
+    success_codes:
+    - 200
+    save_codes:
+    - 200
+    - 422
+    retry_codes:
+    - 500
+    - 502
+    - 503
+  din_details:
+    url: https://kyc-api.surepass.io/api/v1/corporate/get-director-info
+    method: POST
+    payload_template:
+      id_number: '{input}'
+    success_codes:
+    - 200
+    save_codes:
+    - 200
+    - 422
+    retry_codes:
+    - 500
+    - 502
+    - 503
+workflows:
+  rc_details:
+    label: RC Number → RC Details
+    input_field: rc_number
+    api: rc_details
+    token: primary
+  pan_details:
+    label: PAN → PAN Details
+    input_field: pan_number
+    api: pan_details
+    token: primary
+  gst_details:
+    label: GST → GST Details
+    input_field: gst_number
+    api: gst_details
+    token: primary
+  chassis_details:
+    label: Chassis Number → Vehicle Details
+    input_field: chassis_number
+    api: chassis_details
+    token: primary
+  aadhaar_details:
+    label: Aadhaar → Aadhaar Details
+    input_field: aadhaar_number
+    api: aadhaar_details
+    token: primary
+  cin_details:
+    label: CIN → Company Details
+    input_field: cin_number
+    api: cin_details
+    token: primary
+  din_details:
+    label: DIN → Director Details
+    input_field: din_number
+    api: din_details
+    token: primary
+retry:
+  max_attempts: 3
+  backoff_base_seconds: 2

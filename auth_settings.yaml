@@ -1,0 +1,17 @@
+master_account:
+  username: dheerajkandpal1111@gmail.com
+  full_name: dheeraj kandpal
+  password: CHANGE_ME_NOW
+user_defaults:
+  primary_login: email
+  username_optional: true
+  store_users_in_file: true
+  self_signup_enabled: false
+  access_request_enabled: true
+managed_users:
+- username: dheerajkandpal1111@gmail.com
+  email: null
+  full_name: dheeraj kandpal
+  role: owner
+  is_active: true
+  auth_source: master

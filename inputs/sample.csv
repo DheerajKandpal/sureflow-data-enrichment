@@ -1,0 +1,6 @@
+identifier,workflow,payload_note
+AABCP1234C,pan_verify,Standard PAN card — expect 200 success
+MH12AB1234,rc_verify,Vehicle RC number — expect 200 success
+INVALID99,pan_verify,Contains INVALID and ends with 99 — expect 422
+TIMEOUT00,rc_verify,Ends with 00 — simulates server error — expect 500
+,pan_verify,Empty identifier — expect 400 bad request

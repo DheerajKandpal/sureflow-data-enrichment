@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Environment — NEVER commit .env (use .env.example instead)
+.env
+
+# Database
+data/*.db
+*.db
+
+# Logs
+logs/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Inputs — ignore all real client data; only commit sample.csv
+inputs/*
+!inputs/sample.csv
+
+# Outputs — ignore generated CSVs
+outputs/
+
+# API response cache
+responses/
