@@ -40,6 +40,12 @@ inputs/records.csv  →  Provider Layer  →  outputs/results_20260405.csv
 
 ---
 
+## 📸 Demo
+
+![Demo Output](assets/demo.png)
+
+---
+
 ## ⚡ Key Features
 
 | Feature | What it means |
